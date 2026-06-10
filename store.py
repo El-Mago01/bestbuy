@@ -30,6 +30,10 @@ class Store:
             total_items += product.quantity
         return total_items
 
+    def print_total_quantity(self) -> int:
+        """Returns how many items are in the store in total."""
+        print(f"There are currently {self.get_total_quantity()} items in the store")
+
     def get_all_products(self) -> list:
         """Returns all products in the store that are active."""
         active_products = []
@@ -37,6 +41,11 @@ class Store:
             if product.active:
                 active_products.append(product)
         return active_products
+
+    def print_all_products(self):
+        active_prods = self.get_all_products()
+        for product in active_prods:
+            product.show()
 
     def order(self, shopping_list) -> float:
         """Gets a list of tuples, where each tuple has 2 items:
@@ -65,6 +74,6 @@ def main():
     all_products = best_buy.get_all_products()
     for product in all_products:
         product.show()
-        
+
 if __name__ == "__main__":
     main()
