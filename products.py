@@ -1,20 +1,34 @@
 class ProductUnavailable(Exception):
+    """
+    Exception definition for when product or not enough product quantity is available
+    """
+
     pass
 
+
 class Product:
+    """
+    Definition for the product class
+    """
+
     @staticmethod
-    def calc_price(price, quantity)-> float:
+    def calc_price(price, quantity) -> float:
+        """
+        Just fooling around with static methods
+        """
         return price * quantity
 
     def __init__(self, name, price, quantity):
         if len(name) == 0:
-            raise ValueError ("Product name can not be empty")
+            raise ValueError("Product name can not be empty")
         self.name = name
         try:
             self.price = price
             self.quantity = quantity
         except ValueError as e:
-            raise ValueError (f"Please ensure price is a value in $ and quantity is a number")
+            raise ValueError(
+                "Please ensure price is a value in $ and quantity is a number"
+            ) from e
         self.active = True
 
     def get_quantity(self) -> int:
@@ -23,8 +37,7 @@ class Product:
         return self.quantity
 
     def set_quantity(self, quantity):
-        """Setter function for quantity. If quantity reaches 0, deactivates the product.
-        """
+        """Setter function for quantity. If quantity reaches 0, deactivates the product."""
         self.quantity = quantity
         if quantity == 0:
             self.active = True
@@ -49,17 +62,23 @@ class Product:
 
     def buy(self, quantity) -> float:
         """Buys a given quantity of the product.
-         Returns the total price (float) of the purchase.
-         Updates the quantity of the product.
-         In case of a problem it raises an Exception."""
+        Returns the total price (float) of the purchase.
+        Updates the quantity of the product.
+        In case of a problem it raises an Exception."""
         if self.quantity < quantity:
-            raise ProductUnavailable ("Not enough quantity available for "
-                f"product {self.product}. Only {self.quantity} items available")
+            raise ProductUnavailable(
+                "Not enough quantity available for "
+                f"product {self.name}. Only {self.quantity} items available"
+            )
         self.quantity -= quantity
         return Product.calc_price(self.price, quantity)
 
 
 def main():
+    """
+    test code to test the basic functionality for the Product class
+    :return:
+    """
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
     mac = Product("MacBook Air M2", price=1450, quantity=100)
 
@@ -73,7 +92,6 @@ def main():
     bose.set_quantity(1000)
     bose.show()
 
+
 if __name__ == "__main__":
     main()
-
-

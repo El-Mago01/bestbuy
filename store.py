@@ -1,18 +1,25 @@
 import products
 
+
 class NotInStore(Exception):
+    """
+    Exception definition for when product or not enough product quantity is available
+    """
+
     pass
 
 
 class Store:
+    """
+    Definition for the Store class
+    """
 
     def __init__(self, product_list, name):
         self.name = name
         self.product_list = product_list
 
-
     def get_store_name(self):
-        """ returns the name of the store"""
+        """returns the name of the store"""
         return self.name
 
     def add_product(self, product):
@@ -32,7 +39,9 @@ class Store:
 
     def print_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        print(f"There are currently {self.get_total_quantity()} items in the store")
+        print(
+            f"There are currently {
+                self.get_total_quantity()} items in the store")
 
     def get_all_products(self) -> list:
         """Returns all products in the store that are active."""
@@ -43,6 +52,10 @@ class Store:
         return active_products
 
     def print_all_products(self):
+        """
+        print all the available products in the store according to requirements
+        :return:
+        """
         active_prods = self.get_all_products()
         for product in active_prods:
             product.show()
@@ -56,14 +69,20 @@ class Store:
             try:
                 sales += product_list_item.buy(quantity)
             except products.ProductUnavailable as e:
-                raise NotInStore ("Product not available. ", e)
+                raise NotInStore("Product not available. ") from e
         return sales
 
+
 def main():
-    product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
-                    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                    products.Product("Google Pixel 7", price=500, quantity=250),
-                    ]
+    """
+    Some initial testing of the store
+    :return:
+    """
+    product_list = [
+        products.Product("MacBook Air M2", price=1450, quantity=100),
+        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+        products.Product("Google Pixel 7", price=500, quantity=250),
+    ]
 
     best_buy = Store(product_list, "BEST BUY")
     all_products = best_buy.get_all_products()
@@ -74,6 +93,7 @@ def main():
     all_products = best_buy.get_all_products()
     for product in all_products:
         product.show()
+
 
 if __name__ == "__main__":
     main()
