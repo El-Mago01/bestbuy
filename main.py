@@ -1,9 +1,8 @@
+import store
+import products
 import sys
 import os
 import subprocess
-import store
-import products
-
 
 def clear_screen():
     """
@@ -19,7 +18,7 @@ def clear_screen():
             print("\n" * 100)
 
 
-def command_quit(the_store):
+def command_quit():
     """
     quits the application
     :return:
@@ -28,31 +27,12 @@ def command_quit(the_store):
 
 
 def print_all_products(the_store):
-    """
-    prints all the available products from the store.
-    :param the_store:
-    :return:
-    """
     the_store.print_all_products()
 
-
 def print_total_quantity(the_store):
-    """
-    initiates the printing of the total items in the store
-    :param the_store:
-    :return:
-    """
     the_store.print_total_quantity()
 
-
 def order_from_store(the_store):
-    """
-    Get all the relevant input from the user to generate an order list
-    and to create the order to the store.
-    Prints the price to pay for the order
-    :param the_store:
-    :return:
-    """
     all_products = the_store.get_all_products()
     choice = 0
     for product in all_products:
@@ -66,7 +46,7 @@ def order_from_store(the_store):
     while True:
         print("When you want to finish order, enter empty text.")
         order_product = input("Which product # do you want? ")
-        if len(order_product) == 0:  # break when empty text is provided
+        if len(order_product) == 0: # break when empty text is provided
             break
         try:
             order_product = int(order_product)
@@ -80,20 +60,13 @@ def order_from_store(the_store):
             order_list.append((order_product, order_quantity))
         except (TypeError, ValueError):
             print("Please enter a valid choice!")
-    try:
-        print(f"Order made! Total payment: {the_store.order(order_list)}")
-    except store.NotInStore as e:
-        print("Could not create order: ",e)
+    print(f"Order made! Total payment: {the_store.order(order_list)}")
     # input("\nPress enter to continue")
 
-
-def start():
-    """Responsible for displaying the menu and ensure correct input
-    for menu choices from the user"""
-
-    #
-    # Function Dispatch Dictionary:
-    #
+def start(the_store):
+    """
+    Function Dispatch Dictionary
+    """
     functions = {
         1: (print_all_products, "List all products in store"),
         2: (print_total_quantity, "Show total amount in store"),
@@ -113,21 +86,15 @@ def start():
         except (TypeError, ValueError):
             print("Please enter a valid choice!")
 
-
 def main():
-    """
-    Responsible for construction the store with a predefined product list and for initiating the menu.
-    :return: -
-    """
     # setup initial stock of inventory
-    product_list = [
-        products.Product("MacBook Air M2", price=1450, quantity=100),
-        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-        products.Product("Google Pixel 7", price=500, quantity=250),
-    ]
+    product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
+                    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+                    products.Product("Google Pixel 7", price=500, quantity=250)
+                    ]
     best_buy = store.Store(product_list, "BEST BUY!!!")
     while True:
-        menu_selection = start()
+        menu_selection = start(best_buy)
         menu_selection(best_buy)
         input("\nPress enter to continue")
 
