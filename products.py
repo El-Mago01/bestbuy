@@ -18,47 +18,47 @@ class Product:
         """
         return price * quantity
 
-    def __init__(self, name, price, quantity) -> None:
+    def __init__(self, name:str, price:float, quantity:int) -> None:
         if len(name) == 0:
             raise ValueError("Product name can not be empty")
-        self.__name = name
+        self._name = name
         if not (isinstance(price, float) or isinstance(price, int)):
             raise ValueError("Please ensure price is valid")
         if price < 0:
             raise ValueError("Please ensure price is valid")
-        self.__price = price
+        self._price = price
         if not isinstance(quantity, int):
             raise ValueError("Please ensure quantity is a valid number")
         if quantity < 0:
             raise ValueError("Please ensure quantity is a valid number")
-        self.__quantity:int = quantity
+        self._quantity:int = quantity
         self.__active = True
 
     def get_quantity(self) -> int:
         """Getter function for quantity.
         Returns the quantity (int)."""
-        return self.__quantity
+        return self._quantity
 
     def set_quantity(self, quantity:int) -> None:
         """Setter function for quantity. If quantity reaches 0, deactivates the product."""
-        self.__quantity = quantity
+        self._quantity = quantity
         if quantity == 0:
             self.__active = True
 
     def get_name(self) -> str:
-        return self.__name
+        return self._name
 
     def set_name(self, new_name:str):
         if len(new_name) == 0:
             raise ValueError ("Please ensure the new name is valid")
-        self.__name = new_name
+        self._name = new_name
 
     def get_price(self) -> float:
-        return self.__price
+        return self._price
 
     def set_price(self, new_price: float):
         try:
-            self.__price:float = new_price
+            self._price:float = new_price
         except ValueError as e:
             raise ValueError(
                 "Please ensure price is a valid price"
@@ -80,25 +80,57 @@ class Product:
     def show(self):
         """Prints a string that represents the product, for example:
         "MacBook Air M2, Price: 1450, Quantity: 100" """
-        return(f"{self.__name}, Price: {self.__price:.2f}, Quantity: {self.__quantity}")
+        return(f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}")
 
     def buy(self, quantity) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase.
         Updates the quantity of the product.
         In case of a problem it raises an Exception."""
-        if self.__quantity < quantity:
+        if self._quantity < quantity:
             raise ProductUnavailable(
                 "Not enough quantity available for "
-                f"product {self.__name}. Only {self.__quantity} items available"
+                f"product {self._name}. Only {self._quantity} items available"
             )
         if self.__active == False:
             raise ProductUnavailable(
                 "Sorry, product can not be purchased. Product is not active")
-        self.__quantity -= quantity
-        if self.__quantity == 0:
+        self._quantity -= quantity
+        if self._quantity == 0:
             self.__active = False
-        return Product.calc_price(self.__price, quantity)
+        return Product.calc_price(self._price, quantity)
+
+class NonStockedProduct(Product):
+    def __init__(self, name:str, price:float) -> None:
+        super().__init__(name, price,0)
+
+    def set_quantity(self, quantity):
+        self._quantity = 0
+
+    def buy(self, quantity)->float:
+        if not self.is_active():
+            raise ProductUnavailable("Product not available. Product is not active")
+        self._quantity = quantity+1
+        price = super().buy(quantity)
+        self._quantity = 0
+        return price
+
+    def show(self):
+        return f"{self._name}, Price: {self._price:.2f}, Quantity: unlimited"
+
+class LimitedProduct(Product):
+    def __init__(self, name:str, price:float, quantity, maximum):
+        self.__max_order_size = maximum
+        super().__init__(name, price, quantity)
+
+    def buy(self, quantity:int) -> float:
+        if quantity > self.__max_order_size:
+            raise ValueError(f"Only {self.__max_order_size} articles per order are allowed for this Product")
+        price = super().buy(quantity)
+        return price
+
+    def show(self):
+        return f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}, Max. order size = {self.__max_order_size}"
 
 
 def main():
@@ -106,6 +138,9 @@ def main():
     test code to test the basic functionality for the Product class
     :return:
     """
+
+    # setup initial stock of inventory
+
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
     mac = Product("MacBook Air M2", price=1450, quantity=100)
 

@@ -34,7 +34,7 @@ class Store:
         """Returns how many items are in the store in total."""
         total_items = 0
         for product in self.product_list:
-            total_items += product.quantity
+            total_items += product.get_quantity()
         return total_items
 
     def print_total_quantity(self) -> int:
@@ -47,7 +47,7 @@ class Store:
         """Returns all products in the store that are active."""
         active_products = []
         for product in self.product_list:
-            if product.active:
+            if product.is_active():
                 active_products.append(product)
         return active_products
 
@@ -58,7 +58,7 @@ class Store:
         """
         active_prods = self.get_all_products()
         for product in active_prods:
-            product.show()
+            print(product.show())
 
     def order(self, shopping_list) -> float:
         """Gets a list of tuples, where each tuple has 2 items:
@@ -78,11 +78,12 @@ def main():
     Some initial testing of the store
     :return:
     """
-    product_list = [
-        products.Product("MacBook Air M2", price=1450, quantity=100),
-        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-        products.Product("Google Pixel 7", price=500, quantity=250),
-    ]
+    product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
+                    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+                    products.Product("Google Pixel 7", price=500, quantity=250),
+                    products.NonStockedProduct("Windows License", price=125),
+                    products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
+                    ]
 
     best_buy = Store(product_list, "BEST BUY")
     all_products = best_buy.get_all_products()
