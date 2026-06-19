@@ -37,17 +37,84 @@ Product testables:
         -   the correct show is provided
         -   product is activated
         -   total of available products correctly increased
+
 3.      Buying products
 3.1     Buy an active product with an available quantity
         -   check the right price
         -   check available quantity is reduced correctly
         -   check that the product remains active
 
+3.2     Buy an active product where the quantity is too high
+        -   check the right assertion
+        -   check that the available quantity is not reduced
+        -   check that the product remains active
 
+3.3     Buy one active NonStockedProduct successfully
+        -   check that the quantity remains 0
+        -   check that the is_active remains True
+        -   check that the right price is calculated
+
+
+3.4     Buy 5 NonStockedProducts successfully
+        -   check that the quantity remains 0
+        -   check that the is_active remains True
+        -   check that the right price is calculated
+
+
+3.5     Buy an active LimitedProduct successfully, with maximum quantity
+        -   check that the quantity remains 0
+        -   check that the is_active remains True
+        -   check that the right price is calculated
+
+3.6     Buy too many LimitedPRoducts. I.e. more than the maximum quantity
+        -   check the right assertion
+        -   check that the available quantity is not reduced
+        -   check that the product remains active
+
+
+4       Promotions
+4.1     setting and activating of a promotion for a normal product
+        -   Check that the promotion is indeed set in the printout of the product
+        -   Check that the promotion is active
+        -   buy a product, check that the promotion is calculated for the price
+
+4.2     setting and activating of a promotion for a non-stocked product
+        -   Check that the promotion is indeed set in the printout of the product
+        -   Check that the promotion is active
+        -   buy a product, check that the promotion is calculated for the price
+
+4.3     setting and activating of a promotion for a limited product
+        -   Check that the promotion is indeed set in the printout of the product
+        -   Check that the promotion is active
+        -   buy a product, check that the promotion is calculated for the price
+
+4.4     Removing a promotion
+
+4.4     Changing a promotion
+
+4.4     Deactivating a promotion
+
+5       Buy normal product with promotion
+5.1     Buy normal product with promotion, for buy 3, pay 2 promotion.
+        remove promotion and buy it again
+        - check correct prices
+        - check activation and removal
+        -
+
+5.2     Buy normal product, for 2nd half price promotion
+        deactivate promotion and buy it again.
+        - check correct prices
+        - check activation and deactivation
+
+5.3     Buy normal product, for x percent off promotion
+        deactivate promotion and buy it again.
+        - check correct prices
+
+        Repeat 5.1, 5.2 and 5.3 for the 2 other product types
 """
 import pytest
 from products import Product, ProductUnavailable, LimitedProduct, NonStockedProduct
-
+import promotions
 # 1.1
 def test_create_new_product():
     prod = Product("test product", 100.00, 50)
@@ -120,6 +187,7 @@ def test_illegal_deactivation():
     prod.__activate = False
     assert prod.is_active() == True
 
+#3.1
 def test_buy_product():
     prod = Product("test product", 100, 50)
     price = prod.buy(10)
@@ -127,12 +195,15 @@ def test_buy_product():
     assert prod.get_quantity() == 40
     assert prod.is_active() == True
 
+#3.2
 def test_buy_product_quantity_too_high():
     prod = Product("test product", price=100.00, quantity=50)
     with pytest.raises(ProductUnavailable, match="Not enough quantity available"):
         price = prod.buy(51)
     assert prod.is_active() == True
+    assert prod.get_quantity() == 50
 
+#3.3
 def test_buy_nonsstockedproduct():
     prod = NonStockedProduct("test product", 100)
     price = prod.buy(1)
@@ -140,6 +211,7 @@ def test_buy_nonsstockedproduct():
     assert prod.get_quantity() == 0
     assert prod.is_active() == True
 
+#3.4
 def test_buy_nonsstockedproduct_5_elements():
         prod = NonStockedProduct("test product", 100)
         price = prod.buy(5)
@@ -147,6 +219,7 @@ def test_buy_nonsstockedproduct_5_elements():
         assert prod.get_quantity() == 0
         assert prod.is_active() == True
 
+#3.5
 def test_buy_limitedproduct_at_maximum():
     prod = LimitedProduct("test product", 100, quantity=2, maximum=2)
     price = prod.buy(2)
@@ -154,11 +227,194 @@ def test_buy_limitedproduct_at_maximum():
     assert prod.get_quantity() == 0
     assert prod.is_active() == False
 
+#3.6
 def test_buy_limitedproduct_over_maximum():
     prod = LimitedProduct("test product", 100, quantity=3, maximum=2)
     with pytest.raises(ValueError, match="^Only 2 articles per order are allowed for this Product"):
         price = prod.buy(3)
     assert prod.is_active() == True
 
+#4.1
+def test_set_percentage_discount_for_normal_product():
+    prod1 = Product("Test Normal Product", price=100.00, quantity=50)
+    promo1 = promotions.PercentDiscount("Now 20% off!", percent=20)
+    prod1.set_promotion(promo1)
+    assert prod1.show() == "Test Normal Product, Price: 100.00, Quantity: 50, Promotion: Now 20% off!"
+    assert prod1.get_quantity() == 50
+    assert prod1.is_active() == True
+    assert prod1.get_price() == 100
+    assert promo1.is_active() == True
+#4.2
+def test_set_third_one_free_discount_for_non_stocked_product():
+    prod2 = NonStockedProduct("Test Non Stocked Product", 100)
+    promo2 = promotions.ThirdOneFree("Pay 2, bring home 3!")
+    prod2.set_promotion(promo2)
+    assert prod2.show() == "Test Non Stocked Product, Price: 100.00, Quantity: unlimited, Promotion: Pay 2, bring home 3!"
+    assert prod2.get_quantity() == 0
+    assert prod2.is_active() == True
+    assert prod2.get_price() == 100
+    assert promo2.is_active() == True
+#4.3
+def test_set_percent_discount_for_limited_product():
+    prod3 = LimitedProduct("test limited product", 100, quantity=2, maximum=2)
+    promo3 = promotions.SecondHalfPrice("2nd for half price! Now!")
+    prod3.set_promotion(promo3)
+    assert prod3.show() == "test limited product, Price: 100.00, Quantity: 2, Max. order size = 2, Promotion: 2nd for half price! Now!"
+    assert prod3.get_quantity() == 2
+    assert prod3.is_active() == True
+    assert prod3.get_price() == 100
+    assert promo3.is_active() == True
 
+#4.4
+def test_remove_percent_discount_for_limited_product():
+    prod3 = LimitedProduct("test limited product", 100, quantity=2, maximum=2)
+    promo3 = promotions.SecondHalfPrice("2nd for half price! Now!")
+    prod3.set_promotion(promo3)
+    assert prod3.show() == "test limited product, Price: 100.00, Quantity: 2, Max. order size = 2, Promotion: 2nd for half price! Now!"
+    assert prod3.get_quantity() == 2
+    assert prod3.is_active() == True
+    assert prod3.get_price() == 100
+    assert promo3.is_active() == True
+    prod3.remove_promotion()
+    assert prod3.is_active() == True
+    assert promo3.is_active() == True
+    assert prod3.show() == "test limited product, Price: 100.00, Quantity: 2, Max. order size = 2"
+#5.1
+def test_buy_normal_product_with_promotion1():
+    prod = Product("Test Normal Product", price=100, quantity=5)
+    promo = promotions.ThirdOneFree("Pay 2, bring home 3!")
+    prod.set_promotion(promo)
+    price = prod.buy(2)
+    assert prod.get_quantity() == 2
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == 2*100
+    prod.remove_promotion()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == False
+    assert prod.get_promotion() is None
+    assert price == 2*100
+#5.2
+def test_buy_normal_product_with_promotion2():
+    prod = Product("Test Normal Product", price=100, quantity=6)
+    promo = promotions.SecondHalfPrice("Second for half price! Now!")
+    prod.set_promotion(promo)
+    price = prod.buy(4)
+    assert prod.get_quantity() == 2
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == 4*100 - (2*.5*100)
+    prod.remove_promotion()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == False
+    assert prod.get_promotion() is None
+    assert price == 2*100
+#5.3
+def test_buy_normal_product_with_promotion3():
+    prod = Product("Test Normal Product", price=100, quantity=8)
+    promo = promotions.PercentDiscount("20% Off!! Buy Now. Limited action", 20)
+    prod.set_promotion(promo)
+    price = prod.buy(4)
+    assert prod.get_quantity() == 4
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == (1*100 - 0.2*100)*4
+    prod.remove_promotion()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 2
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2*100
+#5.4
+def test_buy_non_stocked_product_with_promotion1():
+    prod = NonStockedProduct("Test Normal Product", price=100)
+    promo = promotions.ThirdOneFree("Pay 2, bring home 3!")
+    prod.set_promotion(promo)
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == 2*100
+    promo.deactivate()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2*100
+#5.5
+def test_buy_non_stocked_product_with_promotion2():
+    prod = NonStockedProduct("Test Normal Product", price=100)
+    promo = promotions.SecondHalfPrice("Second for half price! Now!")
+    prod.set_promotion(promo)
+    price = prod.buy(4)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == 4*100 - (2*.5*100)
+    promo.deactivate()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2 * 100
+#5.6
+def test_buy_non_stocked_product_with_promotion3():
+    prod = NonStockedProduct("Test Normal Product", price=100)
+    promo = promotions.PercentDiscount("20% Off!! Buy Now. Limited action", 20)
+    prod.set_promotion(promo)
+    price = prod.buy(4)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == (1*100 - 0.2*100)*4
+    promo.deactivate()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2 * 100
+#5.7
+def test_buy_limited_product_with_promotion1():
+    prod = LimitedProduct("Test Normal Product", price=100, quantity=3, maximum=2)
+    promo = promotions.ThirdOneFree("Pay 2, bring home 3!")
+    prod.set_promotion(promo)
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == False
+    assert prod.get_promotion() is None
+    assert price == 2*100
 
+#5.8
+def test_buy_limited_product_with_promotion2():
+    prod = LimitedProduct("Test Normal Product", price=100, quantity=5, maximum=2)
+    promo = promotions.SecondHalfPrice("Second for half price! Now!")
+    prod.set_promotion(promo)
+    price = prod.buy(2)
+    assert prod.get_quantity() == 3
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == 2*100 - (1*.5*100)
+    promo.deactivate()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 1
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2 * 100
+#5.9
+def test_buy_limited_product_with_promotion3():
+    prod = LimitedProduct("Test Normal Product", price=100, quantity=6, maximum=4)
+    promo = promotions.PercentDiscount("20% Off!! Buy Now. Limited action", 20)
+    prod.set_promotion(promo)
+    price = prod.buy(4)
+    assert prod.get_quantity() == 2
+    assert prod.is_active() == True
+    assert prod.get_promotion() is promo
+    assert price == (1*100 - 0.2*100)*4
+    promo.deactivate()
+    price = prod.buy(2)
+    assert prod.get_quantity() == 0
+    assert prod.is_active() == False
+    assert prod.get_promotion() is None
+    assert price == 2 * 100
