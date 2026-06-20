@@ -14,9 +14,21 @@ class Store:
     Definition for the Store class
     """
 
-    def __init__(self, product_list, name):
+    def __init__(self, product_list:list, name:str):
+        if not isinstance(name, str) or not isinstance(product_list, list):
+            raise TypeError("Wrong construction of the store!")
+        if len(name) == 0:
+            raise TypeError("Wrong construction of the store! Shop name must be valid.")
         self.name = name
         self.product_list = product_list
+
+    def __contains__(self, item):
+        for product in self.product_list:
+            if item in product.get_name():
+                if product.is_active():
+                    return True
+                return True
+        return False
 
     def get_store_name(self):
         """returns the name of the store"""
@@ -60,16 +72,33 @@ class Store:
         for product in active_prods:
             print(product.show())
 
-    def order(self, shopping_list) -> float:
+    def order(self, shopping_list: list[tuple]) -> float:
         """Gets a list of tuples, where each tuple has 2 items:
         Product (Product class) and quantity (int).
         Buys the products and returns the total price of the order."""
+        if not isinstance(shopping_list, list):
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        if len(shopping_list) == 0:
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        if not isinstance(shopping_list[0], tuple):
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        if len(shopping_list[0]) != 2:
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        if not isinstance(shopping_list[0][0], products.Product):
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        if not isinstance(shopping_list[0][1], int):
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
         sales = 0
-        for product_list_item, quantity in shopping_list:
-            try:
-                sales += product_list_item.buy(quantity)
-            except products.ProductUnavailable as e:
-                raise NotInStore("Product not available. ") from e
+        try:
+            for product_list_item, quantity in shopping_list:
+                try:
+                    sales += product_list_item.buy(quantity)
+                except products.ProductUnavailable as e:
+                    raise NotInStore("Product not available. ") from e
+                except AttributeError:
+                    raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+        except TypeError:
+            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
         return sales
 
 
@@ -85,7 +114,7 @@ def main():
                     products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                     ]
 
-    best_buy = Store(product_list, "BEST BUY")
+    best_buy = Store(1, "BEST BUY")
     all_products = best_buy.get_all_products()
     for product in all_products:
         product.show()

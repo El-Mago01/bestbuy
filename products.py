@@ -37,6 +37,15 @@ class Product:
         self._promotion = None
         self._active = True
 
+    def __gt__(self, other)->bool:
+        return self.get_price() > other.get_price()
+
+    def __lt__(self, other)->bool:
+        return self.get_price() < other.get_price()
+
+    def __eq__(self, other:Product)->bool:
+        return self.get_price() == other.get_price()
+
     def get_quantity(self) -> int:
         """Getter function for quantity.
         Returns the quantity (int)."""
@@ -107,6 +116,10 @@ class Product:
                 return f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}, Promotion: {self._promotion}"
         return f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}"
 
+    def __str__(self) -> str:
+        self.show()
+
+
     def buy(self, buy_quantity) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase.
@@ -132,7 +145,7 @@ class Product:
             if self._quantity <= self._promotion.get_minimum_quantity():
                 self.remove_promotion()
         else:
-            print("no promo", self._price, buy_quantity)
+            # print("no promo", self._price, buy_quantity)
             price = self.calc_price(self._price, buy_quantity)
 
         return price
@@ -163,6 +176,9 @@ class NonStockedProduct(Product):
                 return f"{self._name}, Price: {self._price:.2f}, Quantity: unlimited, Promotion: {promotion}"
         return f"{self._name}, Price: {self._price:.2f}, Quantity: unlimited"
 
+    def __str__(self):
+        self.show()
+
 
 class LimitedProduct(Product):
     def __init__(self, name:str, price:float, quantity, maximum):
@@ -187,6 +203,9 @@ class LimitedProduct(Product):
             if promotion.is_active():
                 return f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}, Max. order size = {self.__max_order_size}, Promotion: {promotion}"
         return f"{self._name}, Price: {self._price:.2f}, Quantity: {self._quantity}, Max. order size = {self.__max_order_size}"
+
+    def __str__(self):
+        self.show()
 
 def main():
     """

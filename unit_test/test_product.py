@@ -111,6 +111,11 @@ Product testables:
         - check correct prices
 
         Repeat 5.1, 5.2 and 5.3 for the 2 other product types
+
+6.      Testing magic methods
+6.1     Check Product A > Product B
+6.2     Check Product A < Product B
+
 """
 import pytest
 from products import Product, ProductUnavailable, LimitedProduct, NonStockedProduct
@@ -418,3 +423,25 @@ def test_buy_limited_product_with_promotion3():
     assert prod.is_active() == False
     assert prod.get_promotion() is None
     assert price == 2 * 100
+
+#6.1 Check if product a > product b is working
+def test_product_a_gt_product_b():
+    prod_a = Product("Normal Product", price=100.00, quantity=2)
+    prod_b = Product("Other Normal Product", price=100.01, quantity=2)
+    assert (prod_a > prod_b) == False
+    assert (prod_a < prod_b) == True
+    assert (prod_a == prod_b) == False
+
+def test_product_a_lt_product_b():
+    prod_a = Product("Normal Product", price=100.01, quantity=2)
+    prod_b = Product("Other Normal Product", price=100.00, quantity=2)
+    assert (prod_a > prod_b) == True
+    assert (prod_a < prod_b) == False
+    assert (prod_a == prod_b) == False
+
+def test_product_a_eq_product_b():
+    prod_a = Product("Normal Product", price=100.00, quantity=2)
+    prod_b = Product("Other Normal Product", price=100.00, quantity=2)
+    assert (prod_a > prod_b) == False
+    assert (prod_a < prod_b) == False
+    assert (prod_a == prod_b) == True
