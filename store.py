@@ -6,15 +6,13 @@ class NotInStore(Exception):
     Exception definition for when product or not enough product quantity is available
     """
 
-    pass
-
 
 class Store:
     """
     Definition for the Store class
     """
 
-    def __init__(self, product_list:list, name:str):
+    def __init__(self, product_list: list, name: str):
         if not isinstance(name, str) or not isinstance(product_list, list):
             raise TypeError("Wrong construction of the store!")
         if len(name) == 0:
@@ -51,8 +49,7 @@ class Store:
 
     def print_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        print(
-            f"There are currently {
+        print(f"There are currently {
                 self.get_total_quantity()} items in the store")
 
     def get_all_products(self) -> list:
@@ -77,17 +74,29 @@ class Store:
         Product (Product class) and quantity (int).
         Buys the products and returns the total price of the order."""
         if not isinstance(shopping_list, list):
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         if len(shopping_list) == 0:
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         if not isinstance(shopping_list[0], tuple):
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         if len(shopping_list[0]) != 2:
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         if not isinstance(shopping_list[0][0], products.Product):
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         if not isinstance(shopping_list[0][1], int):
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            )
         sales = 0
         try:
             for product_list_item, quantity in shopping_list:
@@ -95,10 +104,14 @@ class Store:
                     sales += product_list_item.buy(quantity)
                 except products.ProductUnavailable as e:
                     raise NotInStore("Product not available. ") from e
-                except AttributeError:
-                    raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
-        except TypeError:
-            raise TypeError("Shopping list must be a list of '(product, quantity)' pairs")
+                except AttributeError as e:
+                    raise TypeError(
+                        "Shopping list must be a list of '(product, quantity)' pairs"
+                    ) from e
+        except TypeError as e:
+            raise TypeError(
+                "Shopping list must be a list of '(product, quantity)' pairs"
+            ) from e
         return sales
 
 
@@ -107,14 +120,15 @@ def main():
     Some initial testing of the store
     :return:
     """
-    product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
-                    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                    products.Product("Google Pixel 7", price=500, quantity=250),
-                    products.NonStockedProduct("Windows License", price=125),
-                    products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
-                    ]
+    product_list = [
+        products.Product("MacBook Air M2", price=1450, quantity=100),
+        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+        products.Product("Google Pixel 7", price=500, quantity=250),
+        products.NonStockedProduct("Windows License", price=125),
+        products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
+    ]
 
-    best_buy = Store(1, "BEST BUY")
+    best_buy = Store(product_list, "BEST BUY")
     all_products = best_buy.get_all_products()
     for product in all_products:
         product.show()
