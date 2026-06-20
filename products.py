@@ -44,7 +44,7 @@ class Product:
     def __lt__(self, other) -> bool:
         return self.get_price() < other.get_price()
 
-    def __eq__(self, other: Product) -> bool:
+    def __eq__(self, other: "Product") -> bool:
         return self.get_price() == other.get_price()
 
     def get_quantity(self) -> int:
