@@ -57,7 +57,7 @@ def test_22_buy_product_from_store_via_shopping_list_no_promotion():
                             products.NonStockedProduct("Windows License", price=125),
                             products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                             ]
-    best_buy = store.Store(default_product_list, "AJAX Forever")
+    best_buy = store.Store(default_product_list)
     shopping_list = [(best_buy.get_all_products()[0], 10),
                      (best_buy.get_all_products()[1], 10),
                      (best_buy.get_all_products()[2], 10),
@@ -76,7 +76,7 @@ def test_23_buy_product_from_store_via_shopping_list_no_promotion():
                             products.NonStockedProduct("Windows License", price=125),
                             products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                             ]
-    best_buy = store.Store(default_product_list, "AJAX Forever")
+    best_buy = store.Store(default_product_list)
     shopping_list = [(best_buy.get_all_products()[0], 10),
                      (best_buy.get_all_products()[1], 10),
                      (best_buy.get_all_products()[2], 10),

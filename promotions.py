@@ -5,7 +5,7 @@ class Promotion(ABC):
     """Promotion abstract class defining the promotion interface"""
 
     def __init__(self, promotion_text: str):
-        self._promotion_text = promotion_text
+        self.__promotion_text = promotion_text
         self._minimum_quantity = 0 #Defines how many products need to be in stock for the specific promotion
         self.__active = True
 

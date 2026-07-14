@@ -336,7 +336,7 @@ def test_buy_normal_product_with_promotion1():
     price = prod.buy(2)
     assert prod.get_quantity() == 2
     assert prod.is_active()
-    assert prod.get_promotion() is promo
+    assert prod.get_promotion() is None
     assert price == 2 * 100
     prod.remove_promotion()
     price = prod.buy(2)
@@ -442,7 +442,7 @@ def test_buy_limited_product_with_promotion1():
         "Test Normal Product",
         price=100,
         quantity=3,
-        maximum=2)
+        maximum=3)
     promo = promotions.ThirdOneFree("Pay 2, bring home 3!")
     prod.set_promotion(promo)
     price = prod.buy(2)
@@ -451,10 +451,24 @@ def test_buy_limited_product_with_promotion1():
     assert prod.get_promotion() is None
     assert price == 2 * 100
 
+def test_buy_limited_product_with_promotion2():
+    prod = LimitedProduct(
+        "Test Normal Product",
+        price=100,
+        quantity=3,
+        maximum=2)
+    # Note, the promotion below is in conflict with the maximum of the limited product
+    promo = promotions.ThirdOneFree("Pay 2, bring home 3!")
+    prod.set_promotion(promo)
+    price = prod.buy(2)
+    assert prod.get_quantity() == 1
+    assert prod.is_active() == True
+    assert prod.get_promotion() is None
+    assert price == 2 * 100
 # 5.8
 
 
-def test_buy_limited_product_with_promotion2():
+def test_buy_limited_product_with_promotion3():
     prod = LimitedProduct(
         "Test Normal Product",
         price=100,
@@ -476,7 +490,7 @@ def test_buy_limited_product_with_promotion2():
 # 5.9
 
 
-def test_buy_limited_product_with_promotion3():
+def test_buy_limited_product_with_promotion4():
     prod = LimitedProduct(
         "Test Normal Product",
         price=100,
