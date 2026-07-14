@@ -6,7 +6,7 @@ class Promotion(ABC):
 
     def __init__(self, promotion_text: str):
         self.__promotion_text = promotion_text
-        self.__minimum_quantity = 0 #Defines how many products need to be in stock for the specific promotion
+        self._minimum_quantity = 0 #Defines how many products need to be in stock for the specific promotion
         self.__active = True
 
     @abstractmethod
@@ -31,7 +31,7 @@ class Promotion(ABC):
 
     def get_minimum_quantity(self):
         """Get minimum quantity"""
-        return self.__minimum_quantity
+        return self._minimum_quantity
 
     def is_active(self):
         """Is active method"""
@@ -65,7 +65,7 @@ class ThirdOneFree(Promotion):
 
     def __init__(self, promotion_text):
         super().__init__(promotion_text)
-        self.__minimum_quantity = 3
+        self._minimum_quantity = 3
 
     def set_promotion(self):
         pass

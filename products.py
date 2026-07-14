@@ -98,7 +98,7 @@ class Product:
         if not promotion.is_active():
             self._promotion = None
             return False
-        if self._quantity > promotion.get_minimum_quantity():
+        if self._quantity >= promotion.get_minimum_quantity():
             self._promotion = promotion
             return True
         return False
@@ -175,12 +175,13 @@ class Product:
             raise ProductUnavailable(
                 "Sorry, product can not be purchased. Product is not active"
             )
-        # Everything ready for buying the product
+        # Everything is now ready for buying the product
         self.adjust_quantity(-1*receive_quantity)
 
         if self.get_promotion():
             price = self._promotion.calc_price(self._price, buy_quantity)
-            if self._quantity <= self._promotion.get_minimum_quantity():
+            # For a next sale, could this promotion be given to the customer?
+            if self._quantity < self._promotion.get_minimum_quantity():
                 self.remove_promotion()
         else:
             # print("no promo", self._price, buy_quantity)
@@ -190,7 +191,10 @@ class Product:
 
 
 class NonStockedProduct(Product):
-    """Non-Stocked Product. Extension of Product"""
+    """Non-Stocked Product. Extension of Product
+    Here a non-stocked product has an unlimited number of available products.
+    E.g. Number of SW licenses.
+    """
 
     def __init__(self, name: str, price: float) -> None:
         super().__init__(name, price, 0)
@@ -202,7 +206,7 @@ class NonStockedProduct(Product):
         if not self.is_active():
             raise ProductUnavailable("Product not available. Product is not active")
         # make sure there is enough in the non-existing stack.
-        self._quantity = buy_quantity * 2
+        self._quantity = buy_quantity * 20 #ensure that there is enough.
         price = super().buy(buy_quantity)
         self._quantity = 0
         return price
