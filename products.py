@@ -22,18 +22,20 @@ class Product:
         return price * quantity
 
     def __init__(self, name: str, price: float, quantity: int) -> None:
+        if not isinstance(name, str):
+            raise TypeError("Name must be a string")
         if len(name) == 0:
             raise ValueError("Product name can not be empty")
         self._name = name
         if not isinstance(price, (float, int)):
-            raise ValueError("Please ensure price is valid")
+            raise TypeError("Please ensure price is valid")
         if price < 0:
             raise ValueError("Please ensure price is valid")
         self._price = price
         if not isinstance(quantity, int):
-            raise ValueError("Please ensure quantity is a valid number")
+            raise TypeError("Please ensure quantity is a valid number")
         if quantity < 0:
-            raise ValueError("Please ensure quantity is a valid number")
+            raise ValueError("Please ensure quantity is a positive number")
         self._quantity: int = quantity
         self._promotion = None
         self._active = True
@@ -54,9 +56,28 @@ class Product:
 
     def set_quantity(self, quantity: int) -> None:
         """Setter function for quantity. If quantity reaches 0, deactivates the product."""
+        if not isinstance(quantity, (int, float)):
+            raise TypeError("Please ensure quantity is a valid number")
+        if quantity < 0:
+            raise ValueError("Please ensure quantity is not a negative value")
         self._quantity = quantity
         if quantity == 0:
-            self._active = True
+            self._active = False
+
+    def adjust_quantity(self, quantity_change: int) -> int:
+        """Adjustment function for quantity.
+        If quantity reaches 0, deactivates the product.
+        :param quantity_change: quantity change: A positive change means adding
+        products to the stock. A negative means a reduction.
+        :return Say, there are 10 products in stock and the quantity_change is
+        12 then the return is the available quantity, i.e. 10
+        """
+        if not isinstance(quantity_change, (int, float)):
+            raise TypeError("Please ensure quantity is a valid number")
+
+        self._quantity += quantity_change
+        if self._quantity == 0:
+            self._active = False
 
     def get_name(self) -> str:
         """Return the product name."""
@@ -132,16 +153,20 @@ class Product:
     def __str__(self) -> str:
         return self.show()
 
-    def buy(self, buy_quantity) -> float:
+    def buy(self, buy_quantity:int) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase.
         Updates the quantity of the product.
         In case of a problem it raises an Exception."""
+        if not isinstance(buy_quantity, int):
+            TypeError("Please ensure quantity is a valid number")
+        if buy_quantity < 0:
+            ValueError("Please ensure quantity is not a negative value")
         receive_quantity = buy_quantity
         if isinstance(self._promotion, ThirdOneFree):
             # stock needs extra products in case of the promotion, buy 2, get 3
             receive_quantity += buy_quantity // 2
-        if self._quantity < receive_quantity:
+        if self.get_quantity() < receive_quantity:
             raise ProductUnavailable(
                 "Not enough quantity available for "
                 f"product {self._name}. Only {self._quantity} items available"
@@ -151,9 +176,8 @@ class Product:
                 "Sorry, product can not be purchased. Product is not active"
             )
         # Everything ready for buying the product
-        self._quantity -= receive_quantity
-        if self._quantity == 0:
-            self._active = False
+        self.adjust_quantity(-1*receive_quantity)
+
         if self.get_promotion():
             price = self._promotion.calc_price(self._price, buy_quantity)
             if self._quantity <= self._promotion.get_minimum_quantity():

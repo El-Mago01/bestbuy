@@ -82,6 +82,8 @@ def order_from_store(the_store):
         print(f"Order made! Total payment: {the_store.order(order_list)}")
     except store.NotInStore as e:
         print("Could not create order: ", e)
+    except TypeError as e:
+        print("Aborting, returning to menu")
     # input("\nPress enter to continue")
 
 
@@ -105,7 +107,7 @@ def start():
         for number, function in functions.items():
             print(f"{number} - {function[1]}")
         try:
-            user_choice = int(input("Enter choice(0 - 4): "))
+            user_choice = int(input("Enter choice(1 - 4): "))
             if user_choice in functions:
                 return functions[user_choice][0]
         except (TypeError, ValueError):
@@ -136,7 +138,7 @@ def main():
     product_list[1].set_promotion(third_one_free)
     product_list[3].set_promotion(thirty_percent)
 
-    best_buy = store.Store(product_list, "BEST BUY!!!")
+    best_buy = store.Store(product_list)
     while True:
         menu_selection = start()
         menu_selection(best_buy)

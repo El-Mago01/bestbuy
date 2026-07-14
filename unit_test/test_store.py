@@ -40,7 +40,7 @@ def default_ajax_store():
                 "Google Pixel 7", price=500, quantity=250), products.NonStockedProduct(
                     "Windows License", price=125), products.LimitedProduct(
                         "Shipping", price=10, quantity=250, maximum=1)]
-    ajax_store = store.Store(default_product_list, "AJAX Forever")
+    ajax_store = store.Store(default_product_list)
     return ajax_store
 
 
@@ -62,7 +62,7 @@ def discount_ajax_store():
     default_product_list[2].set_promotion(third_one_free)
     default_product_list[3].set_promotion(thirty_percent)
     default_product_list[4].set_promotion(thirty_percent)
-    ajax_store = store.Store(default_product_list, "AJAX Forever")
+    ajax_store = store.Store(default_product_list)
     return ajax_store
 
 
@@ -75,7 +75,6 @@ third_one_free = promotions.ThirdOneFree("Buy 3, pay2!")
 
 def test_11_store_creation(default_ajax_store):
     default_ajax_store.get_all_products()[3].set_promotion(thirty_percent)
-    # best_buy = store.Store(default_product_list, "AJAX Forever")
     assert default_ajax_store.get_store_name() == "AJAX Forever"
     assert default_ajax_store.get_all_products() == ORIGINAL_PRODUCT_LIST
     assert default_ajax_store.get_all_products(
@@ -85,30 +84,27 @@ def test_11_store_creation(default_ajax_store):
 
 
 def test_12_store_creation_with_no_products():
-    best_buy = store.Store([], "AJAX Forever")
+    best_buy = store.Store([])
     assert best_buy.get_store_name() == "AJAX Forever"
     assert best_buy.get_all_products() == []
 
 # 1.3
 
 
-def test_13_store_creation_with_empty_name():
-    with pytest.raises(TypeError, match="Wrong construction of the store! Shop name must be valid."):
-        best_buy = store.Store([], "")
 
 # 1.4
 
 
 def test_14_store_creation_with_invalid_type_for_product_list():
     with pytest.raises(TypeError, match="Wrong construction of the store!"):
-        best_buy = store.Store(1, "AJAX Forever")
+        best_buy = store.Store(1)
 
 # 1.5
 
 
 def test_15_store_creation_with_invalid_type_for_name():
     with pytest.raises(TypeError, match="Wrong construction of the store!"):
-        best_buy = store.Store([], 1)
+        best_buy = store.Store([""])
 
 # 2.1
 

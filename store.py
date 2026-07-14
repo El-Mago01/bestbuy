@@ -11,13 +11,15 @@ class Store:
     """
     Definition for the Store class
     """
+    name="AJAX Forever"
 
-    def __init__(self, product_list: list, name: str):
-        if not isinstance(name, str) or not isinstance(product_list, list):
+    def __init__(self, product_list: list):
+        if not isinstance(product_list, list):
             raise TypeError("Wrong construction of the store!")
-        if len(name) == 0:
-            raise TypeError("Wrong construction of the store! Shop name must be valid.")
-        self.name = name
+        if len(product_list) > 0:
+            if not isinstance(product_list[0], products.Product):
+                raise TypeError("Wrong construction of the store!")
+
         self.product_list = product_list
 
     def __contains__(self, item):
@@ -34,11 +36,19 @@ class Store:
 
     def add_product(self, product):
         """add a product to the product list"""
+        if not isinstance(product, products.Product):
+            raise TypeError("Wrong use of add_product method!")
         self.product_list.append(product)
 
     def remove_product(self, product):
+        if not isinstance(product, products.Product):
+            raise TypeError("Wrong use of add_product method!")
         """Removes a product from store."""
-        self.product_list.remove(product)
+        try:
+            if product in self.product_list:
+                self.product_list.remove(product)
+        except ValueError as e:
+            print("Product can not be removed as it was not present in the catalogue of the store")
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
@@ -81,9 +91,10 @@ class Store:
             raise TypeError(
                 "Shopping list must be a list of '(product, quantity)' pairs"
             )
-        if not isinstance(shopping_list[0], tuple):
-            raise TypeError(
-                "Shopping list must be a list of '(product, quantity)' pairs"
+        for item in shopping_list:
+            if not isinstance(item, tuple):
+                raise TypeError(
+                    "Shopping list must be a list of '(product, quantity)' pairs"
             )
         if len(shopping_list[0]) != 2:
             raise TypeError(
@@ -128,7 +139,7 @@ def main():
         products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
     ]
 
-    best_buy = Store(product_list, "BEST BUY")
+    best_buy = Store(product_list)
     all_products = best_buy.get_all_products()
     for product in all_products:
         product.show()

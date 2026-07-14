@@ -140,14 +140,14 @@ def test_create_new_product_empty_name():
 
 
 def test_create_with_price_as_string():
-    with pytest.raises(ValueError, match="Please ensure price is valid"):
+    with pytest.raises(TypeError, match="Please ensure price is valid"):
         prod = Product("test product", "100", 50)
 
 # 1.4
 
 
 def test_create_with_quantity_as_float():
-    with pytest.raises(ValueError, match="Please ensure quantity is a valid number"):
+    with pytest.raises(TypeError, match="Please ensure quantity is a valid number"):
         prod = Product("test product", 100, 50.0)
 
 # 1.5
@@ -161,7 +161,7 @@ def test_create_product_with_negative_price():
 
 
 def test_create_product_with_negative_quantity():
-    with pytest.raises(ValueError, match="Please ensure quantity is a valid number"):
+    with pytest.raises(ValueError, match="Please ensure quantity is a positive number"):
         prod = Product("test product", 100, -50)
 
 # 1.7

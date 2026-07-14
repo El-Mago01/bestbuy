@@ -6,7 +6,7 @@ class Promotion(ABC):
 
     def __init__(self, promotion_text: str):
         self.__promotion_text = promotion_text
-        self.__minimum_quantity = 0
+        self.__minimum_quantity = 0 #Defines how many products need to be in stock for the specific promotion
         self.__active = True
 
     @abstractmethod
